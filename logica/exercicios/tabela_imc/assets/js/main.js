@@ -1,53 +1,69 @@
 function escopo(){
-    const form = document.querySelector('.form');
-    const results = document.querySelector('.results');
-    const error = document.querySelector('.error');
-    
-    function envioFormulario(event){
-        event.preventDefault();
+    const form = document.querySelector('#form');
 
-        const peso = Number(form.querySelector('#peso').value);
-        const altura = Number(form.querySelector('#altura').value);
+    form.addEventListener('submit', function (e){
+        e.preventDefault();
+
+        const inputPeso = e.target.querySelector('#peso'); // e.target = form nesse caso
+        const inputAltura = e.target.querySelector('#altura');
+
+        const peso = Number(inputPeso.value);
+        const altura = Number(inputAltura.value);
+
+        if(!peso){
+            setResultado('Peso inválido', false);
+            return;
+        }
+
+        if(!altura){
+            setResultado('Altura inválida', false);
+            return;
+        }
+
+        const imc = getImc(peso, altura);
+        const nivelImc = getNivelImc(imc);
+
+        const msg = `Seu IMC é ${imc} (${nivelImc}).`;
+
+        setResultado(msg, true);
+    });
+
+    function getNivelImc(imc){
+        const niveis = ['Abaixo do peso', 'Peso normal', 'Sobrepeso', 'Obesidade grau 1', 'Obesidade grau 2', 'Obesidade grau 3'];
         
-        results.innerHTML = '';
-        error.innerHTML = '';
-
-        if(Number.isNaN(peso) || !peso){
-            error.innerHTML += 'Peso inválido<br>';
-        }
-
-        if(Number.isNaN(altura) || !altura){
-            error.innerHTML += 'Altura inválida<br>';
-        }
-
-        if(peso && altura && !Number.isNaN(peso) && Number.isNaN(altura)){
-            const imc = peso / (altura ** 2);
-        
-            if(imc){ // Se for NaN vai dar false
-                results.innerHTML = `Seu IMC é ${imc.toFixed(2)}`;
-            }
-
-            if(imc < 18.5){
-                results.innerHTML += ' (Abaixo do peso)';
-            }
-            else if(imc >= 18.5 && imc < 25){
-                results.innerHTML += ' (Peso normal)';
-            }
-            else if(imc >= 25 && imc < 30){
-                results.innerHTML += ' (Sobrepeso)';
-            }
-            else if(imc >= 30 && imc < 35){
-                results.innerHTML += ' (Obesidade grau 1)';
-            }
-            else if(imc >= 35 && imc < 40){
-                results.innerHTML += ' (Obesidade grau 2)';
-            }
-            else if(imc >= 40){
-                results.innerHTML += ' (Obesidade grau 3)';
-            }
-        }
+        if(imc >= 39.9) return niveis[5];
+        if(imc >= 34.9) return niveis[4];
+        if(imc >= 29.9) return niveis[3];
+        if(imc >= 24.9) return niveis[2];
+        if(imc >= 18.5) return niveis[1];
+        if(imc < 18.5) return niveis[0];
     }
 
-    form.addEventListener('submit', envioFormulario);
+    function getImc(peso, altura){
+        const imc = peso / (altura ** 2);
+        return imc.toFixed(2);
+    }
+
+    function criaP(){
+        const p = document.createElement('p');
+        return p;
+    }
+
+    function setResultado(msg, isValid){
+        const resultado = document.querySelector('#resultado');
+        resultado.innerHTML = '';
+
+        const p = criaP();
+
+        if(isValid){
+            p.classList.add('paragrafo-resultado');
+        }
+        else{
+            p.classList.add('bad');
+        }
+
+        p.innerHTML = msg;
+        resultado.appendChild(p);
+    }
 }
 escopo();

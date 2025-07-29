@@ -68,14 +68,12 @@ table th {
     text-align: left;
 }
 
-.results {
-    background-color: #00FEC2;
-    padding: 0 10px;
-    margin-top: 20px;
+.paragrafo-resultado {
+    background-color: rgb(109, 255, 182);
+    padding: 10px 20px;
 }
 
-.error {
-    background-color: #FC7388;
-    padding: 0 10px;
-    margin-top: 20px;
+.bad {
+    background-color: rgb(255, 150, 150);
+    padding: 10px 20px;
 }
