@@ -21,10 +21,35 @@
     const form = document.querySelector('#form');
     const resultado = document.querySelector('#resultado');
 
-    function calculaDigito(arrayCPF){
-        let tamanho = arrayCPF.length + 1;
+    function ValidaCPF(cpfEnviado){
+        Object.defineProperty(this, 'cpfLimpo', {
+            enumerable: true,
+            get: function (){
+                return cpfEnviado.replace(/\D+/g, '');
+            }
+        })
+    }
+    
+    ValidaCPF.prototype.valida = function (){
+        if(typeof this.cpfLimpo === 'undefined') return false;
+        if(this.cpfLimpo.length !== 11) return false;
+        // if(this.isSequencia()) return false;
 
-        const conta = arrayCPF.reduce((acc, v) => {
+        const digito1 = this.calculaDigito(this.cpfLimpo.slice(0, -2));
+        const digito2 = this.calculaDigito(this.cpfLimpo.slice(0, -1));
+
+        const resultadoCPF = this.cpfLimpo.slice(0, -2) + digito1 + digito2;
+
+        return resultadoCPF === this.cpfLimpo;
+    }
+
+    ValidaCPF.prototype.calculaDigito = function (cpfParcial){
+        let cpfArray = Array.from(cpfParcial);
+        cpfArray = cpfArray.map(v => Number(v));
+
+        let tamanho = cpfArray.length + 1;
+
+        const conta = cpfArray.reduce((acc, v) => {
             acc += v * tamanho;
             tamanho--;
             return acc;
@@ -35,18 +60,20 @@
         return digito > 9 ? 0 : digito;
     }
 
-    function validarCPF(cpf){
-        const cpfTratado = cpf.replace(/\D+/g, '');
-        let arrayCPF = Array.from(cpfTratado);
+    ValidaCPF.prototype.isSequencia = function (){
+        const sequencia = this.cpfLimpo[0].repeat(this.cpfLimpo.length);
         
-        arrayCPF = arrayCPF.map(v => Number(v));
+        return sequencia === this.cpfLimpo;
+    }
 
-        const digito1 = calculaDigito(arrayCPF.slice(0, -2));
-        const digito2 = calculaDigito(arrayCPF.slice(0, -1));
+    form.addEventListener('submit', event => {
+        event.preventDefault();
 
-        const resultadoCPF = arrayCPF.slice(0, -2).join('') + digito1 + digito2;
+        const inputCPF = form.querySelector('#cpf');
+        
+        const cpf = new ValidaCPF(inputCPF.value);
 
-        if(resultadoCPF === cpfTratado){
+        if(cpf.valida()){
             resultado.classList.remove('invalid');
             resultado.classList.add('valid');
             resultado.innerText = 'O CPF digitado é válido';
@@ -56,13 +83,5 @@
             resultado.classList.add('invalid');
             resultado.innerText = 'O CPF digitado é inválido';
         }
-    }
-
-    form.addEventListener('submit', event => {
-        event.preventDefault();
-
-        const inputCPF = form.querySelector('#cpf');
-
-        validarCPF(inputCPF.value);
     });
 })();
